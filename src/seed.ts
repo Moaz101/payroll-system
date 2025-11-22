@@ -56,10 +56,10 @@ async function seed() {
     await seedTimeManagement(mongoose.connection, employees, departments, positions);
 
     // 7. Seed Payroll Execution
-    await seedPayrollExecution(mongoose.connection, employees);
+    const payrollExecution = await seedPayrollExecution(mongoose.connection, employees);
 
     // 8. Seed Payroll Tracking
-    await seedPayrollTracking(mongoose.connection, employees);
+    await seedPayrollTracking(mongoose.connection, employees, payrollExecution);
 
     // 9. Seed Leaves
     await seedLeaves(mongoose.connection, employees);

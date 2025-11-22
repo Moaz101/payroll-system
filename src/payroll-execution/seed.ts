@@ -2,8 +2,10 @@ import mongoose from 'mongoose';
 import { payrollRuns } from './models/payrollRuns.schema';
 import { employeePayrollDetailsSchema } from './models/employeePayrollDetails.schema';
 import { employeePenaltiesSchema } from './models/employeePenalties.schema';
+import { paySlipSchema } from './models/payslip.schema';
 import { SchemaFactory } from '@nestjs/mongoose';
-import { PayRollStatus, PayRollPaymentStatus, BankStatus } from './enums/payroll-execution-enum';
+import { PayRollStatus, PayRollPaymentStatus, BankStatus, PaySlipPaymentStatus } from './enums/payroll-execution-enum';
+import { ConfigStatus } from '../payroll-configuration/enums/payroll-configuration-enums';
 
 const payrollRunsSchema = SchemaFactory.createForClass(payrollRuns);
 
@@ -11,11 +13,13 @@ export async function seedPayrollExecution(connection: mongoose.Connection, empl
   const PayrollRunsModel = connection.model('payrollRuns', payrollRunsSchema);
   const EmployeePayrollDetailsModel = connection.model('employeePayrollDetails', employeePayrollDetailsSchema);
   const EmployeePenaltiesModel = connection.model('employeePenalties', employeePenaltiesSchema);
+  const PaySlipModel = connection.model('paySlip', paySlipSchema);
 
   console.log('Clearing Payroll Execution...');
   await PayrollRunsModel.deleteMany({});
   await EmployeePayrollDetailsModel.deleteMany({});
   await EmployeePenaltiesModel.deleteMany({});
+  await PaySlipModel.deleteMany({});
 
   console.log('Seeding Payroll Runs...');
   const janRun = await PayrollRunsModel.create({
@@ -54,5 +58,33 @@ export async function seedPayrollExecution(connection: mongoose.Connection, empl
   });
   console.log('Employee Penalties seeded.');
 
-  return { janRun };
+  console.log('Seeding Payslips...');
+  const bobPayslip = await PaySlipModel.create({
+    employeeId: employees.bob._id,
+    payrollRunId: janRun._id,
+    earningsDetails: {
+      baseSalary: 15000,
+      allowances: [
+        { name: 'Housing Allowance', amount: 2000, status: ConfigStatus.APPROVED },
+        { name: 'Transport Allowance', amount: 1000, status: ConfigStatus.APPROVED }
+      ],
+      bonuses: [],
+      benefits: [],
+      refunds: []
+    },
+    deductionsDetails: {
+      taxes: [
+        { name: 'Income Tax', rate: 10, status: ConfigStatus.APPROVED }
+      ],
+      insurances: [],
+      penalties: null
+    },
+    totalGrossSalary: 18000,
+    totaDeductions: 1500,
+    netPay: 16500,
+    paymentStatus: PaySlipPaymentStatus.PENDING
+  });
+  console.log('Payslips seeded.');
+
+  return { janRun, bobPayslip };
 }
