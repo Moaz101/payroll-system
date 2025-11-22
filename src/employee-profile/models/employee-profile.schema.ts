@@ -11,15 +11,13 @@ import { Position } from '../../organization-structure/models/position.schema';
 import { AppraisalCycle } from '../../performance/models/appraisal-cycle.schema';
 import { AppraisalRecord } from '../../performance/models/appraisal-record.schema';
 import { AppraisalTemplate } from '../../performance/models/appraisal-template.schema';
+import { payGrade } from '../../payroll-configuration/models/payGrades.schema';
 import { UserProfileBase } from './user-schema';
 
 export type EmployeeProfileDocument = HydratedDocument<EmployeeProfile>;
 
 @Schema({ collection: 'employee_profiles', timestamps: true })
 export class EmployeeProfile extends UserProfileBase {
-  @Prop({ type: Types.ObjectId, auto: true })
-  _id: Types.ObjectId;
-
   // Core IDs
   @Prop({ type: String, required: true, unique: true })
   employeeNumber: string; // HR/Payroll number
@@ -39,6 +37,7 @@ export class EmployeeProfile extends UserProfileBase {
   @Prop({ type: Date })
   contractEndDate?: Date;
 
+  
   @Prop({
     type: String,
     enum: Object.values(ContractType),
@@ -74,9 +73,8 @@ export class EmployeeProfile extends UserProfileBase {
   @Prop({ type: Types.ObjectId, ref: 'Position' })
   supervisorPositionId?: Types.ObjectId;
 
-  //Populated by Payroll subsystem once implemented)
-  @Prop({ type: String })
-  payGradeId?: string;
+  @Prop({ type: Types.ObjectId, ref: payGrade.name })
+  payGradeId?: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: 'AppraisalRecord' })
   lastAppraisalRecordId?: Types.ObjectId;

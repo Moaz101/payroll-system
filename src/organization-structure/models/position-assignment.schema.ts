@@ -9,10 +9,7 @@ export type PositionAssignmentDocument = HydratedDocument<PositionAssignment>;
 
 @Schema({ collection: 'position_assignments', timestamps: true })
 export class PositionAssignment {
-  @Prop({ type: Types.ObjectId, auto: true })
-  _id: Types.ObjectId;
-
-  @Prop({ type: Types.ObjectId, ref: 'EmployeeProfile', required: true })
+  @Prop({ type: Types.ObjectId, ref: EmployeeProfile.name, required: true })
   employeeProfileId: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: 'Position', required: true })

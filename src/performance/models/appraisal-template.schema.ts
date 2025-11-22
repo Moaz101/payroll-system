@@ -61,9 +61,6 @@ export const EvaluationCriterionSchema =
 
 @Schema({ collection: 'appraisal_templates', timestamps: true })
 export class AppraisalTemplate {
-  @Prop({ type: Types.ObjectId, auto: true })
-  _id: Types.ObjectId;
-
   @Prop({ type: String, required: true, unique: true })
   name: string;
 

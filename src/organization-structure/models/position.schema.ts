@@ -6,9 +6,6 @@ export type PositionDocument = HydratedDocument<Position>;
 
 @Schema({ collection: 'positions', timestamps: true })
 export class Position {
-  @Prop({ type: Types.ObjectId, auto: true })
-  _id: Types.ObjectId;
-
   @Prop({ type: String, required: true, unique: true })
   code: string;
 

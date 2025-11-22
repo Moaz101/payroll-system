@@ -33,9 +33,6 @@ export const RatingEntrySchema = SchemaFactory.createForClass(RatingEntry);
 
 @Schema({ collection: 'appraisal_records', timestamps: true })
 export class AppraisalRecord {
-  @Prop({ type: Types.ObjectId, auto: true })
-  _id: Types.ObjectId;
-
   @Prop({ type: Types.ObjectId, ref: 'AppraisalAssignment', required: true })
   assignmentId: Types.ObjectId;
 

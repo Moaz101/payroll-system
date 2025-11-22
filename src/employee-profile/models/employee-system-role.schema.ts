@@ -7,9 +7,6 @@ export type EmployeeSystemRoleDocument = HydratedDocument<EmployeeSystemRole>;
 
 @Schema({ collection: 'employee_system_roles', timestamps: true })
 export class EmployeeSystemRole {
-  @Prop({ type: Types.ObjectId, auto: true })
-  _id: Types.ObjectId;
-
   @Prop({
     type: Types.ObjectId,
     ref: 'EmployeeProfile',

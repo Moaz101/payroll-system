@@ -11,9 +11,6 @@ export type AppraisalAssignmentDocument = HydratedDocument<AppraisalAssignment>;
 
 @Schema({ collection: 'appraisal_assignments', timestamps: true })
 export class AppraisalAssignment {
-  @Prop({ type: Types.ObjectId, auto: true })
-  _id: Types.ObjectId;
-
   @Prop({ type: Types.ObjectId, ref: 'AppraisalCycle', required: true })
   cycleId: Types.ObjectId;
 

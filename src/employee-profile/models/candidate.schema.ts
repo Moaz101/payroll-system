@@ -9,9 +9,6 @@ export type CandidateDocument = HydratedDocument<Candidate>;
 
 @Schema({ collection: 'candidates', timestamps: true })
 export class Candidate extends UserProfileBase {
-  @Prop({ type: Types.ObjectId, auto: true })
-  _id: Types.ObjectId;
-
   @Prop({ type: String, required: true, unique: true })
   candidateNumber: string;
 

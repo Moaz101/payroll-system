@@ -6,9 +6,6 @@ export type DepartmentDocument = HydratedDocument<Department>;
 
 @Schema({ collection: 'departments', timestamps: true })
 export class Department {
-  @Prop({ type: Types.ObjectId, auto: true })
-  _id: Types.ObjectId;
-
   @Prop({ type: String, required: true, unique: true })
   code: string;
 
