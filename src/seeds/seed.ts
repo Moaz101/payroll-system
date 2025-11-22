@@ -1,13 +1,13 @@
 import mongoose from 'mongoose';
-import { seedOrganizationStructure, seedPositionAssignments } from './organization-structure/seed';
-import { seedEmployeeProfile } from './employee-profile/seed';
-import { seedPerformance } from './performance/seed';
-import { seedPayrollConfiguration } from './payroll-configuration/seed';
-import { seedTimeManagement } from './time-management/seed';
-import { seedPayrollExecution } from './payroll-execution/seed';
-import { seedPayrollTracking } from './payroll-tracking/seed';
-import { seedLeaves } from './leaves/seed';
-import { seedRecruitment } from './recruitment/seed';
+import { seedOrganizationStructure, seedPositionAssignments } from './organization-structure.seed';
+import { seedEmployeeProfile } from './employee-profile.seed';
+import { seedPerformance } from './performance.seed';
+import { seedPayrollConfiguration } from './payroll-configuration.seed';
+import { seedTimeManagement } from './time-management.seed';
+import { seedPayrollExecution } from './payroll-execution.seed';
+import { seedPayrollTracking } from './payroll-tracking.seed';
+import { seedLeaves } from './leaves.seed';
+import { seedRecruitment } from './recruitment.seed';
 
 async function seed() {
   const mongoUri = 'mongodb://localhost:27017/hr-system';
@@ -55,17 +55,17 @@ async function seed() {
     // 6. Seed Time Management
     await seedTimeManagement(mongoose.connection, employees, departments, positions);
 
-    // 7. Seed Payroll Execution
-    const payrollExecution = await seedPayrollExecution(mongoose.connection, employees);
+    // 7. Seed Recruitment
+    const recruitmentData = await seedRecruitment(mongoose.connection, employees, departments);
 
-    // 8. Seed Payroll Tracking
+    // 8. Seed Payroll Execution
+    const payrollExecution = await seedPayrollExecution(mongoose.connection, employees, payrollConfig, recruitmentData);
+
+    // 9. Seed Payroll Tracking
     await seedPayrollTracking(mongoose.connection, employees, payrollExecution);
 
-    // 9. Seed Leaves
+    // 10. Seed Leaves
     await seedLeaves(mongoose.connection, employees);
-
-    // 10. Seed Recruitment
-    await seedRecruitment(mongoose.connection, employees, departments);
 
     console.log('Seeding completed successfully.');
   } catch (error) {
