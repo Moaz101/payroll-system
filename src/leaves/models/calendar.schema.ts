@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 
 export type CalendarDocument = HydratedDocument<Calendar>;
 
@@ -9,10 +9,10 @@ export class Calendar {
   year: number;
 
   @Prop({
-    type: [{ date: Date, name: String, type: String }],
+    type: [{ type: Types.ObjectId, ref: 'Holiday' }],
     default: [],
   })
-  holidays: { date: Date; name: string; type: string }[];
+  holidays: Types.ObjectId[];
 
   @Prop({
     type: [{ from: Date, to: Date, reason: String }],
