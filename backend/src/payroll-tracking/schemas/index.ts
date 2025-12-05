@@ -14,7 +14,4 @@ export const payrollTrackingModels: { name: string; schema: Schema }[] = [
   { name: 'Timesheet', schema: TimesheetSchema },
 ];
 
-// backend/src/payroll-tracking/index.ts
-export * from './payroll-tracking.module';
-export * from './payroll-tracking.service';
-export * from './schemas';
+export { DisputeSchema, ClaimSchema, PayslipSchema, PayrollSchema, TimesheetSchema };
