@@ -10,10 +10,15 @@ import { notificationsService } from '@/services/notificationsService';
 import StatsOverview from '@/components/Dashboard/StatsOverview';
 import ActivityChart from '@/components/Dashboard/ActivityChart';
 import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
 
 export default function DashboardPage() {
     const { user } = useAuth();
-    const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const [today, setToday] = useState('');
+
+    useEffect(() => {
+        setToday(new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
+    }, []);
 
     // Role Definitions
     const role = user?.role;
@@ -287,10 +292,10 @@ export default function DashboardPage() {
                                                     }
                                                     secondary={
                                                         <>
-                                                            <Typography variant="body2" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                                                            <Typography component="span" variant="body2" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
                                                                 {notification.message}
                                                             </Typography>
-                                                            <Typography variant="caption" color="text.disabled">
+                                                            <Typography component="span" variant="caption" color="text.disabled">
                                                                 {new Date(notification.createdAt).toLocaleDateString()}
                                                             </Typography>
                                                         </>
