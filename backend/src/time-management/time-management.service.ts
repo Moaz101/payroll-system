@@ -101,6 +101,7 @@ export class TimeManagementService {
       employeeId: dto.employeeId,
       departmentId: dto.departmentId,
       positionId: dto.positionId,
+      shiftTypeId: dto.shiftTypeId,
       shiftId: dto.shiftId,
       scheduleRuleId: dto.scheduleRuleId,
       startDate: new Date(dto.startDate),
@@ -117,6 +118,7 @@ export class TimeManagementService {
       .populate('employeeId', 'firstName lastName employeeNumber')
       .populate('departmentId', 'name')
       .populate('positionId', 'title')
+      .populate('shiftTypeId', 'name')
       .populate('shiftId')
       .populate('scheduleRuleId')
       .exec();
@@ -128,6 +130,7 @@ export class TimeManagementService {
       .populate('employeeId', 'firstName lastName employeeNumber')
       .populate('departmentId', 'name')
       .populate('positionId', 'title')
+      .populate('shiftTypeId', 'name')
       .populate('shiftId')
       .populate('scheduleRuleId')
       .exec();
@@ -141,6 +144,7 @@ export class TimeManagementService {
   async getShiftsByEmployee(employeeId: string) {
     return this.shiftAssignmentModel
       .find({ employeeId })
+      .populate('shiftTypeId', 'name')
       .populate('shiftId')
       .populate('scheduleRuleId')
       .exec();
@@ -152,6 +156,7 @@ export class TimeManagementService {
     if (dto.employeeId) updateData.employeeId = dto.employeeId;
     if (dto.departmentId) updateData.departmentId = dto.departmentId;
     if (dto.positionId) updateData.positionId = dto.positionId;
+    if (dto.shiftTypeId) updateData.shiftTypeId = dto.shiftTypeId;
     if (dto.shiftId) updateData.shiftId = dto.shiftId;
     if (dto.scheduleRuleId) updateData.scheduleRuleId = dto.scheduleRuleId;
     if (dto.startDate) updateData.startDate = new Date(dto.startDate);
@@ -166,6 +171,7 @@ export class TimeManagementService {
     .populate('employeeId', 'firstName lastName employeeNumber')
     .populate('departmentId', 'name')
     .populate('positionId', 'title')
+    .populate('shiftTypeId', 'name')
     .populate('shiftId')
     .populate('scheduleRuleId')
     .exec();
@@ -185,6 +191,7 @@ export class TimeManagementService {
     .populate('employeeId', 'firstName lastName employeeNumber')
     .populate('departmentId', 'name')
     .populate('positionId', 'title')
+    .populate('shiftTypeId', 'name')
     .populate('shiftId')
     .populate('scheduleRuleId')
     .exec();
