@@ -5,7 +5,7 @@ import { TimeExceptionType, TimeExceptionStatus } from "./enums/index";
 
 export type TimeExceptionDocument = HydratedDocument<TimeException>;
 
-@Schema()
+@Schema({ timestamps: true })
 export class TimeException{
     @Prop({type: Types.ObjectId, ref: 'EmployeeProfile', required: true})
     employeeId: Types.ObjectId;

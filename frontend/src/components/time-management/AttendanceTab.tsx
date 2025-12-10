@@ -92,17 +92,19 @@ export default function AttendanceTab() {
     reason: '',
   });
 
-  // Role-based permissions
-  const isAdmin = ['System Admin', 'HR Admin'].includes(userRole);
-  const isHRManager = ['HR Manager'].includes(userRole);
+  // Role-based permissions - matches backend controller @Roles decorators
+  const isSystemAdmin = userRole === 'System Admin';
+  const isHRAdmin = userRole === 'HR Admin';
+  const isHRManager = userRole === 'HR Manager';
+  const isAdmin = isSystemAdmin || isHRAdmin;
   const isManager = ['Department Head', 'Line Manager'].includes(userRole);
   const isEmployee = !isAdmin && !isHRManager && !isManager;
 
-  // Who can do what
+  // Who can do what - based on backend controller
   const canViewAllRecords = isAdmin || isHRManager;
   const canViewTeamRecords = isManager;
-  const canCorrectAttendance = isAdmin || isHRManager || isManager;
-  const canChangePunchPolicy = isAdmin;
+  const canCorrectAttendance = isAdmin || isHRManager || isManager; // PATCH: SYSTEM_ADMIN, HR_ADMIN, HR_MANAGER, DEPARTMENT_HEAD
+  const canChangePunchPolicy = isSystemAdmin; // PATCH punch-policy: SYSTEM_ADMIN only
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');

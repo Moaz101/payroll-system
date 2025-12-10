@@ -92,15 +92,17 @@ export default function CorrectionRequestsTab() {
     fetchData();
   }, []);
 
-  // Role-based permissions
-  const isAdmin = ['System Admin', 'HR Admin'].includes(userRole);
-  const isHRManager = ['HR Manager'].includes(userRole);
-  const isManager = ['Department Head', 'Line Manager'].includes(userRole);
+  // Role-based permissions - matches backend controller @Roles decorators
+  const isSystemAdmin = userRole === 'System Admin';
+  const isHRAdmin = userRole === 'HR Admin';
+  const isHRManager = userRole === 'HR Manager';
+  const isAdmin = isSystemAdmin || isHRAdmin;
+  const isManager = userRole === 'Department Head';
   const isEmployee = !isAdmin && !isHRManager && !isManager;
 
-  // Who can do what
-  const canReview = isAdmin || isHRManager || isManager;
-  const canViewAllRequests = isAdmin || isHRManager;
+  // Who can do what - based on backend controller
+  const canReview = isAdmin || isHRManager || isManager; // PATCH review: SYSTEM_ADMIN, HR_ADMIN, HR_MANAGER, DEPARTMENT_HEAD
+  const canViewAllRequests = isAdmin || isHRManager || isManager; // GET all: SYSTEM_ADMIN, HR_ADMIN, HR_MANAGER, DEPARTMENT_HEAD
   const canViewPendingTab = canReview;
 
   const fetchData = async () => {

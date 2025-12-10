@@ -71,17 +71,19 @@ export default function ShiftAssignmentsTab() {
     status: 'PENDING' as 'PENDING' | 'APPROVED',
   });
 
-  // Role-based permissions
-  const isAdmin = ['System Admin', 'HR Admin'].includes(userRole);
-  const isHRManager = ['HR Manager'].includes(userRole);
+  // Role-based permissions - matches backend controller @Roles decorators
+  const isSystemAdmin = userRole === 'System Admin';
+  const isHRAdmin = userRole === 'HR Admin';
+  const isHRManager = userRole === 'HR Manager';
+  const isAdmin = isSystemAdmin || isHRAdmin;
   const isManager = ['Department Head', 'Line Manager'].includes(userRole);
   const isEmployee = !isAdmin && !isHRManager && !isManager;
 
-  // Who can do what
-  const canCreate = isAdmin || isHRManager;
-  const canEdit = isAdmin || isHRManager;
-  const canDelete = isAdmin || isHRManager;
-  const canChangeStatus = isAdmin || isHRManager || isManager;
+  // Who can do what - based on backend controller
+  const canCreate = isAdmin || isHRManager; // POST: SYSTEM_ADMIN, HR_ADMIN, HR_MANAGER
+  const canEdit = isAdmin || isHRManager; // PATCH: SYSTEM_ADMIN, HR_ADMIN, HR_MANAGER
+  const canDelete = isAdmin; // DELETE: SYSTEM_ADMIN, HR_ADMIN only
+  const canChangeStatus = isAdmin || isHRManager; // PATCH status: SYSTEM_ADMIN, HR_ADMIN, HR_MANAGER
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');

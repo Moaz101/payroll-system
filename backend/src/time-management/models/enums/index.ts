@@ -6,6 +6,14 @@ export enum CorrectionRequestStatus {
     ESCALATED = 'ESCALATED',
 }
 
+export enum ShiftTypeCategory {
+    NORMAL = 'NORMAL',
+    SPLIT = 'SPLIT',
+    OVERNIGHT = 'OVERNIGHT',
+    ROTATIONAL = 'ROTATIONAL',
+    FLEXIBLE = 'FLEXIBLE',
+}
+
 export enum PunchType {
     IN = 'IN',
     OUT = 'OUT',
@@ -37,6 +45,8 @@ export enum TimeExceptionType {
     SHORT_TIME = 'SHORT_TIME',
     OVERTIME_REQUEST = 'OVERTIME_REQUEST',
     MANUAL_ADJUSTMENT = 'MANUAL_ADJUSTMENT',
+    REPEATED_LATENESS = 'REPEATED_LATENESS',
+    UNAUTHORIZED_ABSENCE = 'UNAUTHORIZED_ABSENCE',
 }
 
 export enum TimeExceptionStatus {

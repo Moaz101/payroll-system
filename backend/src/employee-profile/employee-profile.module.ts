@@ -73,6 +73,9 @@ import { extname } from 'path';
   ],
   controllers: [EmployeeProfileController],
   providers: [EmployeeProfileService],
-  exports: [EmployeeProfileService],
+  exports: [
+    EmployeeProfileService,
+    MongooseModule, // Export for use by other modules that need to populate EmployeeProfile
+  ],
 })
 export class EmployeeProfileModule { }

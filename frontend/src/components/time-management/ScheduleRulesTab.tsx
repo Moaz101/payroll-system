@@ -42,12 +42,13 @@ export default function ScheduleRulesTab() {
   const [formData, setFormData] = useState({ name: '', pattern: '', active: true });
   const [userRole, setUserRole] = useState<string>('');
 
-  // Role-based permissions
-  const isAdmin = ['System Admin', 'HR Admin'].includes(userRole);
-  const isHRManager = ['HR Manager'].includes(userRole);
-  const canCreate = isAdmin || isHRManager;
-  const canEdit = isAdmin || isHRManager;
-  const canDelete = isAdmin || isHRManager;
+  // Role-based permissions - matches backend controller @Roles decorators
+  const isSystemAdmin = userRole === 'System Admin';
+  const isHRAdmin = userRole === 'HR Admin';
+  const isAdmin = isSystemAdmin || isHRAdmin;
+  const canCreate = isAdmin; // POST: SYSTEM_ADMIN, HR_ADMIN
+  const canEdit = isAdmin; // PATCH: SYSTEM_ADMIN, HR_ADMIN
+  const canDelete = isSystemAdmin; // DELETE: SYSTEM_ADMIN only
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');

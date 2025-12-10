@@ -2,13 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import { Box, Typography, Paper, Tabs as MuiTabs, Tab, Tooltip, Badge } from '@mui/material';
-import { Clock, Users, Calendar, CalendarDays, LogIn, FileEdit, Sparkles } from 'lucide-react';
+import { Clock, Users, Calendar, CalendarDays, LogIn, FileEdit, Sparkles, TrendingUp, AlertTriangle, BarChart3 } from 'lucide-react';
 import ShiftTypesTab from '@/components/time-management/ShiftTypesTab';
 import ShiftAssignmentsTab from '@/components/time-management/ShiftAssignmentsTab';
 import ScheduleRulesTab from '@/components/time-management/ScheduleRulesTab';
 import HolidaysTab from '@/components/time-management/HolidaysTab';
 import AttendanceTab from '@/components/time-management/AttendanceTab';
 import CorrectionRequestsTab from '@/components/time-management/CorrectionRequestsTab';
+import OvertimeRulesTab from '@/components/time-management/OvertimeRulesTab';
+import LatenessRulesTab from '@/components/time-management/LatenessRulesTab';
+import ReportsTab from '@/components/time-management/ReportsTab';
 import '@/styles/time-management.css';
 
 const tabs = [
@@ -18,6 +21,9 @@ const tabs = [
   { label: 'Holidays', icon: CalendarDays, color: '#F59E0B', gradient: 'linear-gradient(135deg, #F59E0B 0%, #F97316 100%)' },
   { label: 'Attendance', icon: LogIn, color: '#EC4899', gradient: 'linear-gradient(135deg, #EC4899 0%, #F472B6 100%)' },
   { label: 'Corrections', icon: FileEdit, color: '#14B8A6', gradient: 'linear-gradient(135deg, #14B8A6 0%, #06B6D4 100%)' },
+  { label: 'Overtime Rules', icon: TrendingUp, color: '#F97316', gradient: 'linear-gradient(135deg, #F97316 0%, #FB923C 100%)' },
+  { label: 'Lateness Rules', icon: AlertTriangle, color: '#EF4444', gradient: 'linear-gradient(135deg, #EF4444 0%, #F87171 100%)' },
+  { label: 'Reports', icon: BarChart3, color: '#3B82F6', gradient: 'linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%)' },
 ];
 
 export default function TimeManagementPage() {
@@ -44,6 +50,9 @@ export default function TimeManagementPage() {
       case 3: return <HolidaysTab />;
       case 4: return <AttendanceTab />;
       case 5: return <CorrectionRequestsTab />;
+      case 6: return <OvertimeRulesTab />;
+      case 7: return <LatenessRulesTab />;
+      case 8: return <ReportsTab />;
       default: return <ShiftTypesTab />;
     }
   };

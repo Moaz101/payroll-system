@@ -16,10 +16,21 @@ import { LatenessRule, latenessRuleSchema } from './models/lateness-rule.schema'
 import { HolidaySchema, Holiday } from './models/holiday.schema';
 import { SettingsSchema, Settings } from './models/settings.schema';
 
+// Integration Services
+import { PayrollIntegrationService } from './integrations/payroll-integration.service';
+import { LeavesIntegrationService } from './integrations/leaves-integration.service';
+import { OrgStructureIntegrationService } from './integrations/org-structure-integration.service';
+import { NotificationIntegrationService } from './integrations/notification-integration.service';
+import { PerformanceIntegrationService } from './integrations/performance-integration.service';
+
+// Import EmployeeProfileModule for populate functionality
+import { EmployeeProfileModule } from '../employee-profile/employee-profile.module';
+
 
 @Module({
   imports: [
     ScheduleModule.forRoot(),
+    EmployeeProfileModule, // Required for populating employeeId references
     MongooseModule.forFeature([
       { name: NotificationLog.name, schema: NotificationLogSchema },
       { name: AttendanceCorrectionRequest.name, schema: AttendanceCorrectionRequestSchema },
@@ -36,6 +47,23 @@ import { SettingsSchema, Settings } from './models/settings.schema';
     ]),
   ],
   controllers: [TimeManagementController],
-  providers: [TimeManagementService]
+  providers: [
+    TimeManagementService,
+    // Integration Services
+    PayrollIntegrationService,
+    LeavesIntegrationService,
+    OrgStructureIntegrationService,
+    NotificationIntegrationService,
+    PerformanceIntegrationService,
+  ],
+  exports: [
+    TimeManagementService,
+    // Export integration services for use by other modules
+    PayrollIntegrationService,
+    LeavesIntegrationService,
+    OrgStructureIntegrationService,
+    NotificationIntegrationService,
+    PerformanceIntegrationService,
+  ],
 })
 export class TimeManagementModule {}

@@ -23,30 +23,75 @@ import {
   Chip,
   CircularProgress,
   IconButton,
+  Grid,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  InputAdornment,
 } from '@mui/material';
-import { Plus, Edit, Trash2, Clock } from 'lucide-react';
+import { Plus, Edit, Trash2, Clock, Sun, Moon, Calendar } from 'lucide-react';
 import { toast } from 'sonner';
+
+// Shift category types
+type ShiftCategory = 'NORMAL' | 'SPLIT' | 'OVERNIGHT' | 'ROTATIONAL' | 'FLEXIBLE';
 
 interface ShiftType {
   _id: string;
+  code: string;
   name: string;
+  category: ShiftCategory;
+  startTime?: string;
+  endTime?: string;
+  totalDurationMinutes: number;
+  breakDurationMinutes: number;
+  isNightShift: boolean;
+  isWeekendShift: boolean;
+  graceMinutesIn: number;
+  graceMinutesOut: number;
+  description?: string;
   active: boolean;
 }
+
+const defaultFormData = {
+  code: '',
+  name: '',
+  category: 'NORMAL' as ShiftCategory,
+  startTime: '09:00',
+  endTime: '17:00',
+  totalDurationMinutes: 480,
+  breakDurationMinutes: 60,
+  isNightShift: false,
+  isWeekendShift: false,
+  graceMinutesIn: 15,
+  graceMinutesOut: 10,
+  description: '',
+  active: true,
+};
+
+const categoryLabels: Record<ShiftCategory, { label: string; color: string; bg: string }> = {
+  NORMAL: { label: 'Normal', color: '#10B981', bg: 'rgba(16, 185, 129, 0.1)' },
+  SPLIT: { label: 'Split', color: '#8B5CF6', bg: 'rgba(139, 92, 246, 0.1)' },
+  OVERNIGHT: { label: 'Overnight', color: '#3B82F6', bg: 'rgba(59, 130, 246, 0.1)' },
+  ROTATIONAL: { label: 'Rotational', color: '#F59E0B', bg: 'rgba(245, 158, 11, 0.1)' },
+  FLEXIBLE: { label: 'Flexible', color: '#EC4899', bg: 'rgba(236, 72, 153, 0.1)' },
+};
 
 export default function ShiftTypesTab() {
   const [shiftTypes, setShiftTypes] = useState<ShiftType[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingShiftType, setEditingShiftType] = useState<ShiftType | null>(null);
-  const [formData, setFormData] = useState({ name: '', active: true });
+  const [formData, setFormData] = useState(defaultFormData);
   const [userRole, setUserRole] = useState<string>('');
 
-  // Role-based permissions
-  const isAdmin = ['System Admin', 'HR Admin'].includes(userRole);
-  const isHRManager = ['HR Manager'].includes(userRole);
-  const canCreate = isAdmin || isHRManager;
-  const canEdit = isAdmin || isHRManager;
-  const canDelete = isAdmin || isHRManager;
+  // Role-based permissions - matches backend controller @Roles decorators
+  const isSystemAdmin = userRole === 'System Admin';
+  const isHRAdmin = userRole === 'HR Admin';
+  const isAdmin = isSystemAdmin || isHRAdmin;
+  const canCreate = isAdmin; // POST: SYSTEM_ADMIN, HR_ADMIN
+  const canEdit = isAdmin; // PATCH: SYSTEM_ADMIN, HR_ADMIN
+  const canDelete = isSystemAdmin; // DELETE: SYSTEM_ADMIN only
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -91,6 +136,10 @@ export default function ShiftTypesTab() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!formData.code.trim()) {
+      toast.error('Shift type code is required');
+      return;
+    }
     if (!formData.name.trim()) {
       toast.error('Shift type name is required');
       return;
@@ -133,7 +182,21 @@ export default function ShiftTypesTab() {
 
   const handleEdit = (shiftType: ShiftType) => {
     setEditingShiftType(shiftType);
-    setFormData({ name: shiftType.name, active: shiftType.active });
+    setFormData({
+      code: shiftType.code || '',
+      name: shiftType.name,
+      category: shiftType.category || 'NORMAL',
+      startTime: shiftType.startTime || '09:00',
+      endTime: shiftType.endTime || '17:00',
+      totalDurationMinutes: shiftType.totalDurationMinutes || 480,
+      breakDurationMinutes: shiftType.breakDurationMinutes || 60,
+      isNightShift: shiftType.isNightShift || false,
+      isWeekendShift: shiftType.isWeekendShift || false,
+      graceMinutesIn: shiftType.graceMinutesIn || 15,
+      graceMinutesOut: shiftType.graceMinutesOut || 10,
+      description: shiftType.description || '',
+      active: shiftType.active,
+    });
     setDialogOpen(true);
   };
 
@@ -166,7 +229,7 @@ export default function ShiftTypesTab() {
   };
 
   const resetForm = () => {
-    setFormData({ name: '', active: true });
+    setFormData(defaultFormData);
     setEditingShiftType(null);
   };
 
@@ -269,7 +332,10 @@ export default function ShiftTypesTab() {
             <Table>
               <TableHead>
                 <TableRow sx={{ bgcolor: 'rgba(99, 102, 241, 0.03)' }}>
+                  <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px', py: 1.75 }}>Code</TableCell>
                   <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px', py: 1.75 }}>Name</TableCell>
+                  <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px', py: 1.75 }}>Category</TableCell>
+                  <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px', py: 1.75 }}>Time</TableCell>
                   <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px', py: 1.75 }}>Status</TableCell>
                   {(canEdit || canDelete) && <TableCell align="right" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px', py: 1.75 }}>Actions</TableCell>}
                 </TableRow>
@@ -277,7 +343,7 @@ export default function ShiftTypesTab() {
               <TableBody>
                 {shiftTypes.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={(canEdit || canDelete) ? 3 : 2} sx={{ py: 10, textAlign: 'center' }}>
+                    <TableCell colSpan={(canEdit || canDelete) ? 6 : 5} sx={{ py: 10, textAlign: 'center' }}>
                       <Box className="tm-empty-state">
                         <Box className="tm-empty-state-icon" sx={{ mb: 2 }}>
                           <Clock size={48} color="#CBD5E1" />
@@ -304,6 +370,9 @@ export default function ShiftTypesTab() {
                       }}
                     >
                       <TableCell>
+                        <Typography sx={{ fontWeight: 600, color: '#6366F1', fontSize: '0.85rem' }}>{shiftType.code || 'N/A'}</Typography>
+                      </TableCell>
+                      <TableCell>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                           <Box
                             sx={{
@@ -315,7 +384,52 @@ export default function ShiftTypesTab() {
                               transition: 'all 0.3s ease',
                             }}
                           />
-                          <Typography sx={{ fontWeight: 600, color: '#1E293B' }}>{shiftType.name}</Typography>
+                          <Box>
+                            <Typography sx={{ fontWeight: 600, color: '#1E293B' }}>{shiftType.name}</Typography>
+                            {shiftType.description && (
+                              <Typography variant="caption" sx={{ color: '#64748B' }}>{shiftType.description}</Typography>
+                            )}
+                          </Box>
+                        </Box>
+                      </TableCell>
+                      <TableCell>
+                        <Box sx={{ display: 'flex', gap: 0.5 }}>
+                          <Chip
+                            label={categoryLabels[shiftType.category]?.label || shiftType.category}
+                            size="small"
+                            sx={{
+                              bgcolor: categoryLabels[shiftType.category]?.bg || 'rgba(99, 102, 241, 0.1)',
+                              color: categoryLabels[shiftType.category]?.color || '#6366F1',
+                              fontWeight: 600,
+                              fontSize: '0.7rem',
+                            }}
+                          />
+                          {shiftType.isNightShift && (
+                            <Chip
+                              icon={<Moon size={12} />}
+                              label="Night"
+                              size="small"
+                              sx={{ bgcolor: 'rgba(59, 130, 246, 0.1)', color: '#3B82F6', fontWeight: 600, fontSize: '0.65rem' }}
+                            />
+                          )}
+                          {shiftType.isWeekendShift && (
+                            <Chip
+                              icon={<Calendar size={12} />}
+                              label="Weekend"
+                              size="small"
+                              sx={{ bgcolor: 'rgba(236, 72, 153, 0.1)', color: '#EC4899', fontWeight: 600, fontSize: '0.65rem' }}
+                            />
+                          )}
+                        </Box>
+                      </TableCell>
+                      <TableCell>
+                        <Box>
+                          <Typography sx={{ fontWeight: 600, color: '#1E293B', fontSize: '0.85rem' }}>
+                            {shiftType.startTime || '--'} - {shiftType.endTime || '--'}
+                          </Typography>
+                          <Typography variant="caption" sx={{ color: '#64748B' }}>
+                            {Math.floor((shiftType.totalDurationMinutes || 0) / 60)}h {(shiftType.totalDurationMinutes || 0) % 60}m (incl. {shiftType.breakDurationMinutes || 0}m break)
+                          </Typography>
                         </Box>
                       </TableCell>
                       <TableCell>
@@ -377,7 +491,7 @@ export default function ShiftTypesTab() {
       <Dialog
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
-        maxWidth="sm"
+        maxWidth="md"
         fullWidth
         PaperProps={{
           className: 'tm-dialog',
@@ -411,35 +525,182 @@ export default function ShiftTypesTab() {
         </DialogTitle>
         <form onSubmit={handleSubmit}>
           <DialogContent sx={{ pt: 3 }}>
-            <TextField
-              label="Shift Type Name"
-              placeholder="e.g., Morning Shift, Night Shift"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              required
-              fullWidth
-              sx={{ 
-                mb: 2.5,
-                '& .MuiOutlinedInput-root': {
-                  '&:hover fieldset': { borderColor: '#6366F1' },
-                  '&.Mui-focused fieldset': { borderColor: '#6366F1' },
-                },
-                '& .MuiInputLabel-root.Mui-focused': { color: '#6366F1' },
-              }}
-            />
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={formData.active}
-                  onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
-                  sx={{
-                    '& .MuiSwitch-switchBase.Mui-checked': { color: '#10B981' },
-                    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: '#10B981' },
+            <Grid container spacing={2}>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <TextField
+                  label="Shift Code"
+                  placeholder="e.g., DAY-001"
+                  value={formData.code}
+                  onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+                  required
+                  fullWidth
+                  sx={{ 
+                    '& .MuiOutlinedInput-root': {
+                      '&:hover fieldset': { borderColor: '#6366F1' },
+                      '&.Mui-focused fieldset': { borderColor: '#6366F1' },
+                    },
+                    '& .MuiInputLabel-root.Mui-focused': { color: '#6366F1' },
                   }}
                 />
-              }
-              label={<Typography sx={{ fontWeight: 500 }}>Active</Typography>}
-            />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <TextField
+                  label="Shift Name"
+                  placeholder="e.g., Morning Shift"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  required
+                  fullWidth
+                  sx={{ 
+                    '& .MuiOutlinedInput-root': {
+                      '&:hover fieldset': { borderColor: '#6366F1' },
+                      '&.Mui-focused fieldset': { borderColor: '#6366F1' },
+                    },
+                    '& .MuiInputLabel-root.Mui-focused': { color: '#6366F1' },
+                  }}
+                />
+              </Grid>
+              <Grid size={{ xs: 12 }}>
+                <TextField
+                  label="Description"
+                  placeholder="Optional description for this shift type"
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  fullWidth
+                  multiline
+                  rows={2}
+                  sx={{ 
+                    '& .MuiOutlinedInput-root': {
+                      '&:hover fieldset': { borderColor: '#6366F1' },
+                      '&.Mui-focused fieldset': { borderColor: '#6366F1' },
+                    },
+                    '& .MuiInputLabel-root.Mui-focused': { color: '#6366F1' },
+                  }}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <FormControl fullWidth>
+                  <InputLabel>Category</InputLabel>
+                  <Select
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value as ShiftCategory })}
+                    label="Category"
+                  >
+                    <MenuItem value="NORMAL">Normal</MenuItem>
+                    <MenuItem value="SPLIT">Split</MenuItem>
+                    <MenuItem value="OVERNIGHT">Overnight</MenuItem>
+                    <MenuItem value="ROTATIONAL">Rotational</MenuItem>
+                    <MenuItem value="FLEXIBLE">Flexible</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 3 }}>
+                <TextField
+                  label="Start Time"
+                  type="time"
+                  value={formData.startTime}
+                  onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 3 }}>
+                <TextField
+                  label="End Time"
+                  type="time"
+                  value={formData.endTime}
+                  onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <TextField
+                  label="Total Duration"
+                  type="number"
+                  value={formData.totalDurationMinutes}
+                  onChange={(e) => setFormData({ ...formData, totalDurationMinutes: Number(e.target.value) })}
+                  fullWidth
+                  InputProps={{ endAdornment: <InputAdornment position="end">minutes</InputAdornment> }}
+                  helperText="480 min = 8 hours"
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <TextField
+                  label="Break Duration"
+                  type="number"
+                  value={formData.breakDurationMinutes}
+                  onChange={(e) => setFormData({ ...formData, breakDurationMinutes: Number(e.target.value) })}
+                  fullWidth
+                  InputProps={{ endAdornment: <InputAdornment position="end">minutes</InputAdornment> }}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <TextField
+                  label="Grace Minutes (In)"
+                  type="number"
+                  value={formData.graceMinutesIn}
+                  onChange={(e) => setFormData({ ...formData, graceMinutesIn: Number(e.target.value) })}
+                  fullWidth
+                  InputProps={{ endAdornment: <InputAdornment position="end">minutes</InputAdornment> }}
+                  helperText="Grace period for late arrival"
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <TextField
+                  label="Grace Minutes (Out)"
+                  type="number"
+                  value={formData.graceMinutesOut}
+                  onChange={(e) => setFormData({ ...formData, graceMinutesOut: Number(e.target.value) })}
+                  fullWidth
+                  InputProps={{ endAdornment: <InputAdornment position="end">minutes</InputAdornment> }}
+                  helperText="Grace period for early leave"
+                />
+              </Grid>
+              <Grid size={{ xs: 12 }}>
+                <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={formData.isNightShift}
+                        onChange={(e) => setFormData({ ...formData, isNightShift: e.target.checked })}
+                        sx={{
+                          '& .MuiSwitch-switchBase.Mui-checked': { color: '#3B82F6' },
+                          '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: '#3B82F6' },
+                        }}
+                      />
+                    }
+                    label={<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><Moon size={16} /> Night Shift</Box>}
+                  />
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={formData.isWeekendShift}
+                        onChange={(e) => setFormData({ ...formData, isWeekendShift: e.target.checked })}
+                        sx={{
+                          '& .MuiSwitch-switchBase.Mui-checked': { color: '#EC4899' },
+                          '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: '#EC4899' },
+                        }}
+                      />
+                    }
+                    label={<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><Calendar size={16} /> Weekend Shift</Box>}
+                  />
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={formData.active}
+                        onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
+                        sx={{
+                          '& .MuiSwitch-switchBase.Mui-checked': { color: '#10B981' },
+                          '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: '#10B981' },
+                        }}
+                      />
+                    }
+                    label={<Typography sx={{ fontWeight: 500 }}>Active</Typography>}
+                  />
+                </Box>
+              </Grid>
+            </Grid>
           </DialogContent>
           <DialogActions sx={{ p: 2.5, pt: 0, gap: 1 }}>
             <Button 

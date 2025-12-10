@@ -55,12 +55,13 @@ export default function HolidaysTab() {
     active: true,
   });
 
-  // Role-based permissions
-  const isAdmin = ['System Admin', 'HR Admin'].includes(userRole);
-  const isHRManager = ['HR Manager'].includes(userRole);
-  const canCreate = isAdmin || isHRManager;
-  const canEdit = isAdmin || isHRManager;
-  const canDelete = isAdmin || isHRManager;
+  // Role-based permissions - matches backend controller @Roles decorators
+  const isSystemAdmin = userRole === 'System Admin';
+  const isHRAdmin = userRole === 'HR Admin';
+  const isAdmin = isSystemAdmin || isHRAdmin;
+  const canCreate = isAdmin; // POST: SYSTEM_ADMIN, HR_ADMIN
+  const canEdit = isAdmin; // PATCH: SYSTEM_ADMIN, HR_ADMIN
+  const canDelete = isAdmin; // DELETE: SYSTEM_ADMIN, HR_ADMIN
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
